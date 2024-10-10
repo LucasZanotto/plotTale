@@ -2,24 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Book extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'author_id', 'genre', 'is_finish'];
+    protected $fillable = ['title', 'user_id'];
 
-    // Relacionamento com conteúdos
+    /**
+     * Relação One-to-Many com Content.
+     */
     public function contents()
     {
         return $this->hasMany(Content::class);
     }
 
-    // Relacionamento com o autor
+    /**
+     * Relação Many-to-One com Author.
+     */
     public function author()
     {
-        return $this->belongsTo(Author::class);
+        return $this->belongsTo(Author::class, 'user_id');
     }
 }

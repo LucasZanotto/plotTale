@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Author extends Authenticatable
 {
@@ -11,9 +11,19 @@ class Author extends Authenticatable
 
     protected $fillable = ['name', 'email', 'password', 'about'];
 
-    // Relacionamento com os livros onde o autor contribuiu
-    public function booksContributed()
+    /**
+     * Relação One-to-Many com Content.
+     */
+    public function contents()
     {
-        return $this->hasManyThrough(Book::class, Content::class);
+        return $this->hasMany(Content::class);
+    }
+
+    /**
+     * Relação One-to-Many com Book.
+     */
+    public function books()
+    {
+        return $this->hasMany(Book::class, 'user_id');
     }
 }
