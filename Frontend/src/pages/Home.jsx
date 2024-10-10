@@ -1,63 +1,64 @@
-import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaUserCircle } from 'react-icons/fa';
-import { BookContext } from '../BookContext';
-import './Home.css';
+// src/pages/Home.jsx
+import React, { useState, useEffect } from 'react';
+import BookCard from '../components/BookCard'; // Importando o BookCard
+import { Link } from 'react-router-dom';
+import "./Home.css";
 
 const Home = () => {
-  const navigate = useNavigate();
-  const { books } = useContext(BookContext);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredBooks, setFilteredBooks] = useState(books);
+    const [books, setBooks] = useState([]);
+    const [filteredBooks, setFilteredBooks] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedGenre, setSelectedGenre] = useState('');
 
-  const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    setFilteredBooks(books.filter(book => book.toLowerCase().includes(query)));
-  };
+    useEffect(() => {
+        // Função para buscar os livros do backend
+        const fetchBooks = async () => {
+            const response = await fetch('/api/books');
+            const data = await response.json();
+            setBooks(data);
+            setFilteredBooks(data); // Inicialmente, todos os livros são filtrados
+        };
 
-  const handleBookClick = (book) => {
-    navigate(`/book/${book}`);
-  };
+        fetchBooks();
+    }, []);
 
-  return (
-    <div className="home-container">
-      <header className="header">
-        <Link to="/login">
-          <FaUserCircle size={32} className="account-icon" />
-        </Link>
-      </header>
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Buscar livros..."
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-      </div>
-      <div className="filters">
-        <button>Ação</button>
-        <button>Fantasia</button>
-        <button>Romance</button>
-      </div>
-      
-      <div className="create-book-button">
-        <button onClick={() => navigate('/create-book')}>Criar Livro</button>
-      </div>
+    useEffect(() => {
+        // Filtro de livros baseado no termo de busca e gênero selecionado
+        const filtered = books.filter(book => {
+            const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesGenre = selectedGenre ? book.genre === selectedGenre : true;
+            return matchesSearch && matchesGenre;
+        });
 
-      <div className="books-container">
-        {filteredBooks.map((book, index) => (
-          <div
-            className="book-card"
-            key={index}
-            onClick={() => handleBookClick(book)}
-          >
-            <h3>{book}</h3>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        setFilteredBooks(filtered);
+    }, [searchTerm, selectedGenre, books]);
+
+    return (
+        <div>
+            <header>
+                <Link to="/profile">👤</Link> {/* Ícone de perfil */}
+                <input
+                    type="text"
+                    placeholder="Buscar livros..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </header>
+            <div>
+                <button onClick={() => setSelectedGenre('Ficção')}>Ficção</button>
+                <button onClick={() => setSelectedGenre('Não-ficção')}>Não-ficção</button>
+                {/* Adicione mais botões de gênero conforme necessário */}
+            </div>
+            <Link to="/create-book">
+                <button>Criar Livro</button>
+            </Link>
+            <div className="book-list">
+                {filteredBooks.map(book => (
+                    <BookCard key={book.id} book={book} />
+                ))}
+            </div>
+        </div>
+    );
 };
 
 export default Home;

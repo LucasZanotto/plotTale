@@ -1,67 +1,91 @@
-import React, { useContext, useState } from 'react';
+// src/pages/CreateBook.jsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookContext } from '../BookContext';
 
 const CreateBook = () => {
-  const [bookTitle, setBookTitle] = useState('');
-  const { addBook } = useContext(BookContext);
-  const navigate = useNavigate();
+    const [title, setTitle] = useState('');
+    const [author, setAuthor] = useState('');
+    const [genre, setGenre] = useState('');
+    const [isFinish, setIsFinish] = useState(false);
+    const navigate = useNavigate(); // Hook para redirecionar após a criação
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    addBook(bookTitle);
-    navigate('/');
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  return (
-    <div>
-      <h1>Criar Livro</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Título do Livro"
-          value={bookTitle}
-          onChange={(e) => setBookTitle(e.target.value)}
-        />
-        <button type="submit">Criar</button>
-      </form>
-    </div>
-  );
+        const newBook = {
+            title,
+            author,
+            genre,
+            is_finish: isFinish,
+        };
+
+        try {
+            const response = await fetch('/api/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newBook),
+            });
+
+            if (response.ok) {
+                // Redireciona para a página inicial após a criação bem-sucedida
+                navigate('/');
+            } else {
+                // Lidar com erro (opcional)
+                const errorData = await response.json();
+                console.error('Erro ao criar livro:', errorData);
+            }
+        } catch (error) {
+            console.error('Erro de rede:', error);
+        }
+    };
+
+    return (
+        <div>
+            <h1>Criar Livro</h1>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Título:</label>
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Autor:</label>
+                    <input
+                        type="text"
+                        value={author}
+                        onChange={(e) => setAuthor(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Gênero:</label>
+                    <input
+                        type="text"
+                        value={genre}
+                        onChange={(e) => setGenre(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={isFinish}
+                            onChange={() => setIsFinish(!isFinish)}
+                        />
+                        Finalizado
+                    </label>
+                </div>
+                <button type="submit">Criar Livro</button>
+            </form>
+        </div>
+    );
 };
 
 export default CreateBook;
-
-/*
-
-Book
-{
-Id
-Title,
-Author,
-Content: [{id, authorId: "lucas", content: "era uma vez...", bookId: "1", Stage: "1", IsAprove?}],
-Genre,
-Is_Finish?
-}
-tipo se for o proprio author o Is_Finish sempre vai ser 1, se for um contributor que precisa de aprovação é 0
-
-Author
-{
-Id
-Name
-Mail
-Password
-About
-Book_Contributor: Aqui os livros que a pessoa contribui com contents
-}
-
-Content
-{
-Id,
-Author_Id,
-Content,
-Book_Id,
-Stage: qual o card certo,
-Is_Aprove?
-}
-
-*/

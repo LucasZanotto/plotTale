@@ -56,3 +56,24 @@ cursor: pointer;
 .book-card:hover {
 background-color: #f9f9f9;
 }
+
+/* src/styles.css */
+.book-card {
+border: 1px solid #ccc;
+border-radius: 8px;
+padding: 16px;
+margin: 10px;
+text-align: center;
+cursor: pointer;
+transition: box-shadow 0.3s;
+}
+
+.book-card:hover {
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.book-list {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+}
