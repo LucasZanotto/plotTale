@@ -3,27 +3,26 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Author extends Authenticatable
+class Author extends Authenticatable implements JWTSubject
 {
-    use HasFactory;
+    protected $fillable = [
+        'name', 'email', 'password', 'about',
+    ];
 
-    protected $fillable = ['name', 'email', 'password', 'about'];
+    protected $hidden = [
+        'password',
+    ];
 
-    /**
-     * Relação One-to-Many com Content.
-     */
-    public function contents()
+    // Implementação das funções JWTSubject
+    public function getJWTIdentifier()
     {
-        return $this->hasMany(Content::class);
+        return $this->getKey();
     }
 
-    /**
-     * Relação One-to-Many com Book.
-     */
-    public function books()
+    public function getJWTCustomClaims()
     {
-        return $this->hasMany(Book::class, 'user_id');
+        return [];
     }
 }

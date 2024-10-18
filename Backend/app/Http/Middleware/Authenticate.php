@@ -14,4 +14,12 @@ class Authenticate extends Middleware
     {
         return $request->expectsJson() ? null : route('login');
     }
+
+    /**
+     * Get the guard(s) that should be used for authentication.
+     */
+    protected function guards()
+    {
+        return ['api']; // Altere para usar o guard 'api' por padrão
+    }
 }

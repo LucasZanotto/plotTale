@@ -1,64 +1,99 @@
-// src/pages/Home.jsx
-import React, { useState, useEffect } from 'react';
-import BookCard from '../components/BookCard'; // Importando o BookCard
-import { Link } from 'react-router-dom';
-import "./Home.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Navegação entre páginas
 
 const Home = () => {
-    const [books, setBooks] = useState([]);
-    const [filteredBooks, setFilteredBooks] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedGenre, setSelectedGenre] = useState('');
+  const [filtro, setFiltro] = useState("");  // Estado para o filtro
+  const [livros, setLivros] = useState([]);  // Estado para armazenar os livros
+  const [livrosFiltrados, setLivrosFiltrados] = useState([]); // Estado para armazenar os livros filtrados
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        // Função para buscar os livros do backend
-        const fetchBooks = async () => {
-            const response = await fetch('/api/books');
-            const data = await response.json();
-            setBooks(data);
-            setFilteredBooks(data); // Inicialmente, todos os livros são filtrados
-        };
+  // Função para buscar os livros da API
+  useEffect(() => {
+    const fetchLivros = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/books");
+        setLivros(response.data); // Salva os livros vindos do backend no estado
+        setLivrosFiltrados(response.data); // Inicializa com todos os livros
+      } catch (error) {
+        console.error("Erro ao buscar os livros:", error);
+      }
+    };
 
-        fetchBooks();
-    }, []);
+    fetchLivros(); // Chama a função quando o componente é montado
+  }, []);
 
-    useEffect(() => {
-        // Filtro de livros baseado no termo de busca e gênero selecionado
-        const filtered = books.filter(book => {
-            const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesGenre = selectedGenre ? book.genre === selectedGenre : true;
-            return matchesSearch && matchesGenre;
-        });
+  // Função para navegar até o perfil do autor logado
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
 
-        setFilteredBooks(filtered);
-    }, [searchTerm, selectedGenre, books]);
+  // Função para filtrar os livros pelo nome
+  const handleFilterChange = (event) => {
+    const textoFiltro = event.target.value.toLowerCase();
+    setFiltro(textoFiltro);
 
-    return (
-        <div>
-            <header>
-                <Link to="/profile">👤</Link> {/* Ícone de perfil */}
-                <input
-                    type="text"
-                    placeholder="Buscar livros..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </header>
-            <div>
-                <button onClick={() => setSelectedGenre('Ficção')}>Ficção</button>
-                <button onClick={() => setSelectedGenre('Não-ficção')}>Não-ficção</button>
-                {/* Adicione mais botões de gênero conforme necessário */}
-            </div>
-            <Link to="/create-book">
-                <button>Criar Livro</button>
-            </Link>
-            <div className="book-list">
-                {filteredBooks.map(book => (
-                    <BookCard key={book.id} book={book} />
-                ))}
-            </div>
-        </div>
+    // Filtra os livros com base no texto digitado
+    const livrosFiltrados = livros.filter((livro) =>
+      livro.title.toLowerCase().includes(textoFiltro)
     );
+    setLivrosFiltrados(livrosFiltrados); // Atualiza o estado com os livros filtrados
+  };
+
+  // Função para navegar para a página do livro específico
+  const handleCardClick = (livroId) => {
+    navigate(`/books/${livroId}`);
+  };
+
+  return (
+    <div className="home">
+      {/* Header com o ícone de perfil */}
+      <header style={{ display: "flex", justifyContent: "flex-end", padding: "10px" }}>
+        <img
+          src="/path/to/profile-icon.png" // Substitua com o caminho do ícone de perfil
+          alt="Ícone de Perfil"
+          style={{ cursor: "pointer", width: "40px", height: "40px" }}
+          onClick={handleProfileClick}
+        />
+      </header>
+
+      {/* Input de filtro */}
+      <div style={{ padding: "20px" }}>
+        <input
+          type="text"
+          placeholder="Filtrar livros..."
+          value={filtro}
+          onChange={handleFilterChange}
+          style={{ padding: "10px", width: "100%", fontSize: "16px" }}
+        />
+      </div>
+
+      {/* Lista de livros em forma de cards */}
+      <div style={{ padding: "20px", display: "flex", flexWrap: "wrap", gap: "20px" }}>
+        {livrosFiltrados.length > 0 ? (
+          livrosFiltrados.map((livro) => (
+            <div
+              key={livro.id}
+              style={{
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "20px",
+                width: "200px",
+                textAlign: "center",
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+              }}
+              onClick={() => handleCardClick(livro.id)} // Navega ao clicar no card
+            >
+              <h3>{livro.title}</h3>
+            </div>
+          ))
+        ) : (
+          <p>Nenhum livro encontrado.</p>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Home;
