@@ -69,7 +69,7 @@ const Book = () => {
           <p>{conteudo.content}</p>
           {/* Verifica se o autor existe antes de tentar acessar o nome */}
           <p style={{ textAlign: "right", fontStyle: "italic" }}>
-            por: {conteudo.author ?? conteudo.author.name}
+            por: {conteudo.author ? conteudo.author.name : "Processando autor..."}
           </p>
         </div>
       ))}
