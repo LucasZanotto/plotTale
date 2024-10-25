@@ -53,7 +53,6 @@ const Book = () => {
     <div style={{ padding: "20px" }}>
       <Header />
       <h1>{livro.title}</h1>
-      {console.log(livro.contents)}
       {/* Lista de conteúdos */}
       {livro.contents.map((conteudo) => (
         <div
