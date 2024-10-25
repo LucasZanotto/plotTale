@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import Header from "../components/Header";
 
 const Book = () => {
   const { id } = useParams(); // Pega o ID do livro da URL corretamente
   const [livro, setLivro] = useState(null); // Estado para o livro
   const [novoConteudo, setNovoConteudo] = useState(""); // Estado para o conteúdo a ser criado
+
+  // Recupera o author_id e authorName do localStorage
+  const authorId = localStorage.getItem("authorId");
+  const authorName = localStorage.getItem("authorName");
 
   // Função para buscar o livro e seus conteúdos
   useEffect(() => {
@@ -26,7 +31,7 @@ const Book = () => {
     try {
       const response = await axios.post(`http://localhost:8000/api/contents`, {
         content: novoConteudo,
-        author_id: 1, // ID do autor logado (ajuste conforme necessário)
+        author_id: authorId, // Usando o author_id do localStorage
         book_id: id,
       });
       // Atualiza a lista de conteúdos com o novo conteúdo
@@ -46,8 +51,9 @@ const Book = () => {
 
   return (
     <div style={{ padding: "20px" }}>
+      <Header />
       <h1>{livro.title}</h1>
-
+      {console.log(livro.contents)}
       {/* Lista de conteúdos */}
       {livro.contents.map((conteudo) => (
         <div
@@ -64,7 +70,7 @@ const Book = () => {
           <p>{conteudo.content}</p>
           {/* Verifica se o autor existe antes de tentar acessar o nome */}
           <p style={{ textAlign: "right", fontStyle: "italic" }}>
-            por: {conteudo.author ? conteudo.author.name : "Autor desconhecido"}
+            por: {conteudo.author ?? conteudo.author.name}
           </p>
         </div>
       ))}

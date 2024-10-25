@@ -81,4 +81,14 @@ class BookController extends Controller
 
         return response()->json(['message' => 'Livro deletado com sucesso']);
     }
+
+    public function booksByAuthor($authorId)
+{
+    // Busca todos os conteúdos do autor e carrega os livros relacionados
+    $books = Book::whereHas('contents', function ($query) use ($authorId) {
+        $query->where('author_id', $authorId);
+    })->get();
+
+    return response()->json($books);
+}
 }

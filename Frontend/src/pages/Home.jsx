@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Navegação entre páginas
+import Header from "../components/Header";
 
 const Home = () => {
   const [filtro, setFiltro] = useState("");  // Estado para o filtro
@@ -47,15 +48,8 @@ const Home = () => {
 
   return (
     <div className="home">
+      <Header />
       {/* Header com o ícone de perfil */}
-      <header style={{ display: "flex", justifyContent: "flex-end", padding: "10px" }}>
-        <img
-          src="/path/to/profile-icon.png" // Substitua com o caminho do ícone de perfil
-          alt="Ícone de Perfil"
-          style={{ cursor: "pointer", width: "40px", height: "40px" }}
-          onClick={handleProfileClick}
-        />
-      </header>
 
       {/* Input de filtro */}
       <div style={{ padding: "20px" }}>

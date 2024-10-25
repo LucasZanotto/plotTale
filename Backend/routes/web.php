@@ -1,17 +1,15 @@
 <?php
 
-use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
 
-// Authors (Register/Login)
-Route::get('/register', [AuthorController::class, 'create']);
-Route::post('/register', [AuthorController::class, 'store']);
-Route::get('/login', [AuthorController::class, 'login']);
-Route::post('/login', [AuthorController::class, 'authenticate']);
-Route::get("/home", function(){
-    $objeto = [
-        "nome" => "Lucas",
-        "idade" => 20
-    ];
-    return $objeto;
+Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('login', [AuthController::class, 'login']);
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+
+// Protege as rotas com um middleware customizado
+Route::middleware('checkAuthor')->group(function () {
+    Route::get('/', function () {
+        return view('home'); // Página inicial protegida
+    })->name('home');
 });
-

@@ -1,76 +1,79 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [about, setAbout] = useState('');
-  const [error, setError] = useState(null);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
-  const navigate = useNavigate();
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        
+        const response = await fetch('http://localhost:8000/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, email, password, password_confirmation: passwordConfirmation }),
+        });
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post('http://localhost:8000/api/register', {
-        name,
-        email,
-        password,
-        about
-      });
-      if (response.data) {
-        navigate('/login'); // Redireciona para a página de login após o registro
-      }
-    } catch (err) {
-      setError('Erro ao registrar. Verifique os dados e tente novamente.');
-    }
-  };
+        const data = await response.json();
 
-  return (
-    <div className="auth-container">
-      <h2>Registro</h2>
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleRegister}>
+        if (response.ok) {
+            navigate('/login'); // Redireciona para a página de login
+        } else {
+            setError(data.message);
+        }
+    };
+
+    return (
         <div>
-          <label>Nome</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+            <h2>Register</h2>
+            <form onSubmit={handleRegister}>
+                <div>
+                    <label>Name:</label>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Email:</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Password:</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label>Confirm Password:</label>
+                    <input
+                        type="password"
+                        value={passwordConfirmation}
+                        onChange={(e) => setPasswordConfirmation(e.target.value)}
+                        required
+                    />
+                </div>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                <button type="submit">Register</button>
+            </form>
         </div>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Senha</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Sobre</label>
-          <textarea
-            value={about}
-            onChange={(e) => setAbout(e.target.value)}
-          />
-        </div>
-        <button type="submit">Registrar</button>
-      </form>
-    </div>
-  );
+    );
 };
 
 export default Register;

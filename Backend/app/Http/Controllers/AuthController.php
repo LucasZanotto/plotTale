@@ -3,51 +3,61 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Models\Author;
+use Illuminate\Support\Facades\Hash;
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Author;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+
     public function register(Request $request)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:authors',
-        'password' => 'required|string|min:8|confirmed',
-    ]);
+    {
+        // Validação dos dados recebidos
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:authors',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
 
-    $author = Author::create([
-        'name' => $validatedData['name'],
-        'email' => $validatedData['email'],
-        'password' => Hash::make($validatedData['password']),
-    ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
-    return response()->json($author, 201);
-}
+        // Criação do novo autor
+        $author = Author::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json(['message' => 'Author registered successfully'], 201);
+    }
 
 
     public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
+{
+    // Validação dos dados de login
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::attempt($credentials)) {
-            // O autor está autenticado
-            $author = Auth::user();
-            return response()->json($author); // Retorna os dados do autor autenticado
-        }
+    // Busca o autor pelo email
+    $author = Author::where('email', $request->email)->first();
 
-        return response()->json(['error' => 'Invalid credentials'], 401);
+    // Verifica se o autor foi encontrado e se a senha está correta
+    if ($author && Hash::check($request->password, $author->password)) {
+        // O usuário está autenticado
+        return response()->json(['message' => 'Login successful', 'author' => $author], 200);
     }
 
-    public function logout(Request $request)
-    {
-        Auth::logout(); // Desconecta o autor
-        return response()->json(['message' => 'Successfully logged out']);
-    }
-
-    public function me()
-    {
-        return response()->json(Auth::user()); // Retorna os dados do autor autenticado
-    }
+    return response()->json(['message' => 'Invalid credentials'], 401);
+}
 }

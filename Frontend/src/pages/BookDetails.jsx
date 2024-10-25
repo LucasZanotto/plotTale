@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import Header from '../components/Header';
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -42,6 +43,7 @@ const BookDetails = () => {
 
   return (
     <div className="book-details">
+      <Header />
       <h1>{book.title}</h1>
       <p>Gênero: {book.genre}</p>
       <p>Status: {book.is_finish ? 'Finalizado' : 'Em Progresso'}</p>
