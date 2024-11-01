@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import './Register.css'; // Importe o CSS
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -30,7 +31,7 @@ const Register = () => {
     };
 
     return (
-        <div>
+        <div className="card">
             <h2>Register</h2>
             <form onSubmit={handleRegister}>
                 <div>
@@ -69,7 +70,8 @@ const Register = () => {
                         required
                     />
                 </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {error && <p className="error">{error}</p>}
+                <p>Já possui uma conta? <Link to="/login">Click aqui</Link></p>
                 <button type="submit">Register</button>
             </form>
         </div>

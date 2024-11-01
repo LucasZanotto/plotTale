@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import './Login.css'; // Importe o CSS
 
 const Login = ({ setAuth }) => {
   const [email, setEmail] = useState('');
@@ -33,7 +34,7 @@ const Login = ({ setAuth }) => {
     } catch (err) {
       setError(err.message); // Armazena o erro para exibição
     }
-};
+  };
 
   return (
     <div className="login-container">
@@ -58,7 +59,8 @@ const Login = ({ setAuth }) => {
           />
         </div>
         {error && <p className="error">{error}</p>} {/* Exibe erro se houver */}
-        <button type="submit">Login</button>
+        <p>Ainda não possui uma conta? <Link to="/register">Click aqui</Link></p>
+        <button className='button' type="submit">Login</button>
       </form>
     </div>
   );
