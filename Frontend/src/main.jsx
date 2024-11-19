@@ -33,13 +33,13 @@ const RootApp = () => {
             <Route path="/register" element={<Register />} />
             
             {/* Protegendo a rota Home */}
-            <Route path="/" element={<ProtectedRoute auth={auth}><Home /></ProtectedRoute>} />
+            <Route path="/" element={<Home />} />
             
             {/* Outras rotas protegidas */}
-            <Route path="/profile" element={<ProtectedRoute auth={auth}><Profile /></ProtectedRoute>} />
-            <Route path="/book" element={<ProtectedRoute auth={auth}><Book /></ProtectedRoute>} />
-            <Route path="/books/:id" element={<ProtectedRoute auth={auth}><Book /></ProtectedRoute>} />
-            <Route path="/create-book" element={<ProtectedRoute auth={auth}><CreateBook /></ProtectedRoute>} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/book" element={<Book />} />
+            <Route path="/books/:id" element={<Book />} />
+            <Route path="/create-book" element={<CreateBook />} />
           </Routes>
         </Router>
       </BookProvider>

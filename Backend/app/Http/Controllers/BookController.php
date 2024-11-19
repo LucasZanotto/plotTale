@@ -24,9 +24,14 @@ class BookController extends Controller
         $validated = $request->validate([
             'title'    => 'required|string|max:255',
             'user_id'  => 'required|exists:authors,id',
+            'genre' => 'required|string|max:255',
         ]);
 
-        $book = Book::create($validated);
+        $book = Book::create([
+            'title' => $validated['title'],
+            'user_id' => $validated['user_id'],
+            'genre' => $validated['genre'],
+        ]);
 
         return response()->json($book, 201);
     }
@@ -59,6 +64,7 @@ class BookController extends Controller
         $validated = $request->validate([
             'title'    => 'sometimes|required|string|max:255',
             'user_id'  => 'sometimes|required|exists:authors,id',
+            'genre' => 'sometimes|required|string|max:255',
         ]);
 
         $book->update($validated);

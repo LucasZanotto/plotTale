@@ -10,7 +10,6 @@ const Book = () => {
 
   // Recupera o author_id e authorName do localStorage
   const authorId = localStorage.getItem("authorId");
-  const authorName = localStorage.getItem("authorName");
 
   // Função para buscar o livro e seus conteúdos
   useEffect(() => {
@@ -34,11 +33,20 @@ const Book = () => {
         author_id: authorId, // Usando o author_id do localStorage
         book_id: id,
       });
-      // Atualiza a lista de conteúdos com o novo conteúdo
+
+      // Adiciona o conteúdo sem autor e busca as informações atualizadas
+      const newContent = response.data;
+
+      // Busca o autor atualizado
+      const authorResponse = await axios.get(`http://localhost:8000/api/authors/${newContent.author_id}`);
+      newContent.author = authorResponse.data;
+
+      // Atualiza o estado do livro
       setLivro({
         ...livro,
-        contents: [...livro.contents, response.data],
+        contents: [...livro.contents, newContent],
       });
+
       setNovoConteudo(""); // Limpa o campo de texto após enviar
     } catch (error) {
       console.error("Erro ao criar o conteúdo:", error);
@@ -49,65 +57,61 @@ const Book = () => {
     return <div>Carregando...</div>;
   }
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <Header />
-      <h1>{livro.title}</h1>
-      {/* Lista de conteúdos */}
-      {livro.contents.map((conteudo) => (
-        <div
-          key={conteudo.id}
-          style={{
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            padding: "20px",
-            marginBottom: "20px",
-            width: "100%",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <p>{conteudo.content}</p>
-          {/* Verifica se o autor existe antes de tentar acessar o nome */}
-          <p style={{ textAlign: "right", fontStyle: "italic" }}>
-            por: {conteudo.author ? conteudo.author.name : "Processando autor..."}
-          </p>
-        </div>
-      ))}
-
-      {/* Card para criar novo conteúdo */}
+ return (
+  <div style={{ padding: "20px", paddingTop: "80px" }}> {/* Ajuste aqui */}
+    <Header />
+    <h1>{livro.title}</h1>
+    {livro.contents.map((conteudo) => (
       <div
+        key={conteudo.id}
         style={{
           border: "1px solid #ccc",
           borderRadius: "8px",
           padding: "20px",
-          marginTop: "20px",
+          marginBottom: "20px",
           width: "100%",
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         }}
       >
-        <h3>Criar novo conteúdo</h3>
-        <textarea
-          value={novoConteudo}
-          onChange={(e) => setNovoConteudo(e.target.value)}
-          placeholder="Escreva seu conteúdo aqui..."
-          style={{ width: "100%", padding: "10px", fontSize: "16px", marginBottom: "10px" }}
-        />
-        <button
-          onClick={handleEnviarConteudo}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Enviar
-        </button>
+        <p>{conteudo.content}</p>
+        <p style={{ textAlign: "right", fontStyle: "italic" }}>
+          por: {conteudo.author ? conteudo.author.name : "Processando autor..."}
+        </p>
       </div>
+    ))}
+    <div
+      style={{
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+        padding: "20px",
+        marginTop: "20px",
+        width: "100%",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      <h3>Criar novo conteúdo</h3>
+      <textarea
+        value={novoConteudo}
+        onChange={(e) => setNovoConteudo(e.target.value)}
+        placeholder="Escreva seu conteúdo aqui..."
+        style={{ width: "100%", padding: "10px", fontSize: "16px", marginBottom: "10px" }}
+      />
+      <button
+        onClick={handleEnviarConteudo}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        Enviar
+      </button>
     </div>
-  );
-};
+  </div>
+);
+}
 
 export default Book;

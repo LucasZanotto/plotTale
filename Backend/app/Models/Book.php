@@ -9,7 +9,7 @@ class Book extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'user_id'];
+    protected $fillable = ['title', 'genre', 'user_id'];
 
     /**
      * Relação One-to-Many com Content.

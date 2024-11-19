@@ -1,91 +1,85 @@
-// src/pages/CreateBook.jsx
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import "./CreateBook.css";
 
 const CreateBook = () => {
-    const [title, setTitle] = useState('');
-    const [author, setAuthor] = useState('');
-    const [genre, setGenre] = useState('');
-    const [isFinish, setIsFinish] = useState(false);
-    const navigate = useNavigate(); // Hook para redirecionar após a criação
+  const [title, setTitle] = useState('');
+  const [genre, setGenre] = useState('');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        const newBook = {
-            title,
-            author,
-            genre,
-            is_finish: isFinish,
-        };
+    const authorId = localStorage.getItem('authorId');
 
-        try {
-            const response = await fetch('/api/books', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newBook),
-            });
+    if (!authorId) {
+      alert('Erro: Autor não identificado.');
+      return;
+    }
 
-            if (response.ok) {
-                // Redireciona para a página inicial após a criação bem-sucedida
-                navigate('/');
-            } else {
-                // Lidar com erro (opcional)
-                const errorData = await response.json();
-                console.error('Erro ao criar livro:', errorData);
-            }
-        } catch (error) {
-            console.error('Erro de rede:', error);
-        }
-    };
+    try {
+      console.log("info do livro: ", title, genre, authorId);
+      await axios.post('http://localhost:8000/api/books', {
+        title,
+        genre,
+        user_id: authorId,
+      });
 
-    return (
-        <div>
-            <h1>Criar Livro</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Título:</label>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Autor:</label>
-                    <input
-                        type="text"
-                        value={author}
-                        onChange={(e) => setAuthor(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Gênero:</label>
-                    <input
-                        type="text"
-                        value={genre}
-                        onChange={(e) => setGenre(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={isFinish}
-                            onChange={() => setIsFinish(!isFinish)}
-                        />
-                        Finalizado
-                    </label>
-                </div>
-                <button type="submit">Criar Livro</button>
-            </form>
-        </div>
-    );
+      alert('Livro criado com sucesso!');
+      setTitle('');
+      setGenre('');
+      setError(null);
+
+      navigate('/');
+    } catch (error) {
+      console.error('Erro ao criar livro:', error);
+      setError('Ocorreu um erro ao tentar criar o livro. Tente novamente.');
+    }
+  };
+
+  return (
+    <div>
+      <Header />
+      <div className="create-book-container">
+        <h1 className="create-book-title">Criar Novo Livro</h1>
+        {error && <p className="error-message">{error}</p>}
+        <form onSubmit={handleSubmit} className="create-book-form">
+          <div className="form-group">
+            <label htmlFor="title">Título:</label>
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="genre">Gênero:</label>
+            <select
+              id="genre"
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              required
+            >
+              <option value="">Selecione um gênero</option>
+              <option value="Ação">Ação</option>
+              <option value="Romance">Romance</option>
+              <option value="Terror">Terror</option>
+              <option value="Suspense">Suspense</option>
+              <option value="Mistério">Mistério</option>
+            </select>
+          </div>
+          <button type="submit" className="create-book-button">
+            Criar
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default CreateBook;
