@@ -1,41 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Header from '../components/Header';
-import './Profile.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Header from "../components/Header";
+import "./Profile.css";
 
 const Profile = () => {
   const [author, setAuthor] = useState(null);
   const [books, setBooks] = useState([]);
-  const [about, setAbout] = useState('');
+  const [about, setAbout] = useState("");
   const [isEditingAbout, setIsEditingAbout] = useState(false);
   const navigate = useNavigate();
 
-  // Busca informações do autor e livros contribuídos
+  const handleLogout = () => {
+    localStorage.removeItem("authorId");
+    localStorage.removeItem("authorName");
+    navigate("/");
+  };
+
   useEffect(() => {
     const fetchAuthorData = async () => {
-      const authorId = localStorage.getItem('authorId');
+      const authorId = localStorage.getItem("authorId");
       if (authorId) {
         try {
-          const response = await axios.get(`http://localhost:8000/api/authors/${authorId}`);
+          const response = await axios.get(
+            `http://localhost:8000/api/authors/${authorId}`
+          );
           setAuthor(response.data);
-          setAbout(response.data.about || ''); // Set initial about text
-          const booksResponse = await axios.get(`http://localhost:8000/api/authors/${authorId}/books`);
+          setAbout(response.data.about || "");
+          const booksResponse = await axios.get(
+            `http://localhost:8000/api/authors/${authorId}/books`
+          );
           setBooks(booksResponse.data);
         } catch (error) {
-          console.error('Erro ao buscar dados do autor:', error);
+          console.error("Erro ao buscar dados do autor:", error);
         }
       }
     };
     fetchAuthorData();
   }, []);
 
-  // Salva o novo texto do "about"
   const handleAboutSave = async () => {
-    const authorId = localStorage.getItem('authorId');
+    const authorId = localStorage.getItem("authorId");
     if (authorId) {
       try {
-        await axios.put(`http://localhost:8000/api/authors/${authorId}`, { about });
+        await axios.put(`http://localhost:8000/api/authors/${authorId}`, {
+          about,
+        });
         setIsEditingAbout(false);
       } catch (error) {
         console.error('Erro ao salvar o "about":', error);
@@ -46,6 +56,9 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <Header />
+      <button onClick={handleLogout} className="logout-button">
+        Logout
+      </button>
       {author && (
         <div className="profile-details">
           <h1 className="profile-name">{author.name}</h1>
@@ -64,10 +77,13 @@ const Profile = () => {
                 </button>
               </div>
             ) : (
-              <p>{about || 'O autor ainda não escreveu sobre si mesmo.'}</p>
+              <p>{about || "O autor ainda não escreveu sobre si mesmo."}</p>
             )}
             {!isEditingAbout && (
-              <button onClick={() => setIsEditingAbout(true)} className="edit-about-button">
+              <button
+                onClick={() => setIsEditingAbout(true)}
+                className="edit-about-button"
+              >
                 Editar
               </button>
             )}

@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateContentsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('contents', function (Blueprint $table) {
@@ -20,9 +17,6 @@ class CreateContentsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('contents');

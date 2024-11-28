@@ -7,18 +7,12 @@ use Illuminate\Http\Request;
 
 class ContentController extends Controller
 {
-    /**
-     * Exibir uma lista de conteúdos.
-     */
     public function index()
     {
         $contents = Content::with(['author', 'book'])->get();
         return response()->json($contents);
     }
 
-    /**
-     * Armazenar um novo conteúdo.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -32,9 +26,6 @@ class ContentController extends Controller
         return response()->json($content, 201);
     }
 
-    /**
-     * Exibir um conteúdo específico.
-     */
     public function show($id)
     {
         $content = Content::with(['author', 'book'])->find($id);
@@ -46,9 +37,6 @@ class ContentController extends Controller
         return response()->json($content);
     }
 
-    /**
-     * Atualizar um conteúdo específico.
-     */
     public function update(Request $request, $id)
     {
         $content = Content::find($id);
@@ -68,9 +56,6 @@ class ContentController extends Controller
         return response()->json($content);
     }
 
-    /**
-     * Remover um conteúdo específico.
-     */
     public function destroy($id)
     {
         $content = Content::find($id);

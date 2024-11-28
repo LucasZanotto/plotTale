@@ -9,23 +9,17 @@ use Illuminate\Validation\Rule;
 
 class AuthorController extends Controller
 {
-    /**
-     * Exibir uma lista de autores.
-     */
     public function index()
     {
         $authors = Author::all();
         return response()->json($authors);
     }
 
-    /**
-     * Armazenar um novo autor.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:authors',
+            'email'    => 'required|string|email|max:255',
             'password' => 'required|string|min:6',
             'about'    => 'nullable|string',
         ]);
@@ -37,9 +31,6 @@ class AuthorController extends Controller
         return response()->json($author, 201);
     }
 
-    /**
-     * Exibir um autor específico.
-     */
     public function show($id)
     {
         $author = Author::find($id);
@@ -51,9 +42,6 @@ class AuthorController extends Controller
         return response()->json($author);
     }
 
-    /**
-     * Atualizar um autor específico.
-     */
     public function update(Request $request, $id)
     {
         $author = Author::find($id);
@@ -85,9 +73,6 @@ class AuthorController extends Controller
         return response()->json($author);
     }
 
-    /**
-     * Remover um autor específico.
-     */
     public function destroy($id)
     {
         $author = Author::find($id);

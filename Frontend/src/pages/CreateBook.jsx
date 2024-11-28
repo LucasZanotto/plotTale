@@ -1,42 +1,42 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 import "./CreateBook.css";
 
 const CreateBook = () => {
-  const [title, setTitle] = useState('');
-  const [genre, setGenre] = useState('');
+  const [title, setTitle] = useState("");
+  const [genre, setGenre] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const authorId = localStorage.getItem('authorId');
+    const authorId = localStorage.getItem("authorId");
 
     if (!authorId) {
-      alert('Erro: Autor não identificado.');
+      alert("Erro: Autor não identificado.");
       return;
     }
 
     try {
       console.log("info do livro: ", title, genre, authorId);
-      await axios.post('http://localhost:8000/api/books', {
+      await axios.post("http://localhost:8000/api/books", {
         title,
         genre,
         user_id: authorId,
       });
 
-      alert('Livro criado com sucesso!');
-      setTitle('');
-      setGenre('');
+      alert("Livro criado com sucesso!");
+      setTitle("");
+      setGenre("");
       setError(null);
 
-      navigate('/');
+      navigate("/");
     } catch (error) {
-      console.error('Erro ao criar livro:', error);
-      setError('Ocorreu um erro ao tentar criar o livro. Tente novamente.');
+      console.error("Erro ao criar livro:", error);
+      setError("Ocorreu um erro ao tentar criar o livro. Tente novamente.");
     }
   };
 

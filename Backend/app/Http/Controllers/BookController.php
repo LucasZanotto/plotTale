@@ -7,18 +7,13 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    /**
-     * Exibir uma lista de livros.
-     */
+
     public function index()
     {
         $books = Book::with('contents.author')->get();
         return response()->json($books);
     }
 
-    /**
-     * Armazenar um novo livro.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -36,9 +31,6 @@ class BookController extends Controller
         return response()->json($book, 201);
     }
 
-    /**
-     * Exibir um livro específico com seus conteúdos.
-     */
     public function show($id)
     {
         $book = Book::with('contents.author')->find($id);
@@ -50,9 +42,6 @@ class BookController extends Controller
         return response()->json($book);
     }
 
-    /**
-     * Atualizar um livro específico.
-     */
     public function update(Request $request, $id)
     {
         $book = Book::find($id);
@@ -63,7 +52,7 @@ class BookController extends Controller
 
         $validated = $request->validate([
             'title'    => 'sometimes|required|string|max:255',
-            'user_id'  => 'sometimes|required|exists:authors,id',
+            'user_id'  => 'sometimes|required|exists:authors,id|unique:authors',
             'genre' => 'sometimes|required|string|max:255',
         ]);
 
@@ -72,9 +61,6 @@ class BookController extends Controller
         return response()->json($book);
     }
 
-    /**
-     * Remover um livro específico.
-     */
     public function destroy($id)
     {
         $book = Book::find($id);
@@ -89,12 +75,11 @@ class BookController extends Controller
     }
 
     public function booksByAuthor($authorId)
-{
-    // Busca todos os conteúdos do autor e carrega os livros relacionados
-    $books = Book::whereHas('contents', function ($query) use ($authorId) {
-        $query->where('author_id', $authorId);
-    })->get();
+    {
+        $books = Book::whereHas('contents', function ($query) use ($authorId) {
+            $query->where('author_id', $authorId);
+        })->get();
 
-    return response()->json($books);
-}
+        return response()->json($books);
+    }
 }
